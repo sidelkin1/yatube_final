@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load user_filters %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Пост {{ post.text|truncatewords:30 }}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <aside class="col-12 col-md-3">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    Дата публикации: {{ post.pub_date|date:'d E Y' }}
+                </li>
+                {% if post.group %}
+                    <li class="list-group-item">
+                        Группа:
+                        <a class="btn btn-info btn-sm"
+                           href="{% url 'posts:group_list' post.group.slug %}"             
+                        >
+                            #{{ post.group.title }}
+                            <span class="badge bg-danger">{{ post.group_count }}</span>
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="list-group-item">
+                    Автор:
+                    <a class="btn btn-info btn-sm"
+                       href="{% url 'posts:profile' post.author.username %}"
+                    >
+                        {% if post.author.get_full_name %}
+                            {{ post.author.get_full_name }}
+                        {% else %}
+                            {{ post.author.username }}
+                        {% endif %}
+                        <span class="badge bg-danger">{{ post.author_count }}</span>
+                    </a>
+                </li>
+                <div class="row">
+                    <div class="col-xs-6 col-md-12 text-center">
+                        <h1 class="rating-num">
+                            {% if post.rating_avg %}
+                                {{ post.rating_avg }}
+                            {% else %}
+                                <span class="fa fa-exclamation"></span>
+                            {% endif %}
+                        </h1>
+                        {% with stars=post.rating_avg|getstars  %}
+                            {% include 'posts/includes/rating_stars.html' %}
+                        {% endwith %}
+                        <div>
+                            <span class="fa fa-user"></span> {{ post.rating_count }} всего голосов
+                        </div>
+                    </div>
+                </div>
+                <li class="list-group-item">
+                    {% if user.is_authenticated and user != post.author %}
+                        <form method="post" action="{% url 'posts:rate_post' post.id %}">
+                            {% csrf_token %}
+                            <div class="form-group mb-2">
+                                {{ form_rating.rating|as_crispy_field }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                Изменить рейтинг
+                            </button>
+                        </form>
+                    {% endif %}
+                </li>
+            </ul>            
+        </aside>
+        <div class="col-12 col-md-9">            
+            <article>
+                {% thumbnail post.image "960" as im %}
+                    <img class="card-img my-2" src="{{ im.url }}">
+                {% endthumbnail %}
+                <p>{{ post.text|linebreaksbr }}</p>
+            </article>
+            {% if user == post.author %}
+                <a href="{% url 'posts:post_edit' post.id %}" class="btn btn-primary">
+                    Редактировать
+                </a>
+                <a href="{% url 'posts:post_delete' post.id %}" class="btn btn-danger">                
+                    Удалить
+                </a>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <div class="card my-4">
+                    <h5 class="card-header">Добавить комментарий:</h5>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'posts:add_comment' post.id %}">
+                            {% csrf_token %}      
+                            <div class="form-group mb-2">
+                                {{ form_comment.text|addclass:"form-control" }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">Отправить</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+            {% for comment in comments %}
+                <div class="media mb-4">
+                    <div class="media-body">
+                        <h5 class="mt-0">
+                            <a href="{% url 'posts:profile' comment.author.username %}">
+                                {{ comment.author.username }}
+                            </a>
+                        </h5>
+                        <p>
+                            {{ comment.text|linebreaksbr }}
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>        
+    </div>
+{% endblock %}

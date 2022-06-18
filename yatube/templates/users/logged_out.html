@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Вы вышли из системы{% endblock %}
+
+{% block content %}
+  {% with form_header='Выход' form_body='Вы вышли из своей учётной записи. Ждём вас снова!' has_enter=False %}
+    {% include 'users/includes/form_done.html' %}
+  {% endwith %}
+{% endblock %}

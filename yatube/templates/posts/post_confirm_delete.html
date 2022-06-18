@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Удалить запись
+{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 p-5">
+            <div class="card">
+                <div class="card-header">
+                    Подтвердите удаление поста
+                </div>
+                <div class="card-body">
+                    <article>
+                        <ul>
+                            <li>
+                                Автор: {{ post.author.get_full_name }}
+                            </li>
+                            <li>
+                                Дата публикации: {{ post.pub_date|date:'d E Y' }}
+                            </li>
+                        </ul>
+                        <p>{{ post.text|linebreaksbr }}</p>
+                    </article>
+                    <form method="post">
+                        {% csrf_token %}                        
+                        <div class="col-md-6 offset-md-4">
+                            <button type="submit" class="btn btn-primary">
+                                Удалить
+                            </button>                            
+                            <a href="{% url 'posts:post_detail' post.id %}" class="btn btn-secondary">
+                                Отмена
+                            </a>
+                        </div>
+                    </form>                    
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

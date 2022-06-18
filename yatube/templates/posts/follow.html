@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load cache %}
+
+{% block title %}
+  Это страница с подписками проекта Yatube
+{% endblock %}
+
+{% block content %}
+
+  {% include 'posts/includes/switcher.html' %}
+
+  <h1>Подписки</h1>
+  {% for post in page_obj %}
+    {% include 'posts/includes/post_list.html' %}    
+    {% if not forloop.last %}<hr>{% endif %}
+  {% empty %}
+    <p> Вы не подписаны ни на одного автора! </p>
+  {% endfor %}
+
+  {% include 'includes/paginator.html' %}
+
+{% endblock %}

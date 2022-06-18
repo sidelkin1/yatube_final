@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load cache %}
+
+{% block title %}
+  Это главная страница проекта Yatube
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+
+    <aside class="col-12 col-md-2">
+      <div class="filters panel-group" id="accordion">
+        {% with title='author' heading='автору' param='author' %}
+          {% include 'posts/includes/filter_categories.html' %}
+        {% endwith %}
+        {% with title='group' heading='группе' param='group' %}
+          {% include 'posts/includes/filter_categories.html' %}
+        {% endwith %}
+        {% with title='rating' heading='рейтингу' param='rating' %}
+          {% include 'posts/includes/filter_categories.html' %}
+        {% endwith %}
+      </div>
+    </aside>
+
+    <div class="col-12 col-md-10">
+      {% include 'posts/includes/switcher.html' %}
+
+      <h1>Последние обновления на сайте</h1>
+      {% comment %} {% cache 20 index_page page_obj.object_list %} {% endcomment %}
+        {% for post in page_obj %}
+          {% include 'posts/includes/post_list.html' %}
+          {% if not forloop.last %}<hr>{% endif %}
+        {% empty %}
+          <p> Нет ни одной записи! </p>
+        {% endfor %}
+      {% comment %} {% endcache %} {% endcomment %}
+
+      {% include 'includes/paginator.html' %}      
+    </div>
+
+  </div>
+{% endblock %}

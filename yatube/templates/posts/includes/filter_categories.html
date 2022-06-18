@@ -1,0 +1,23 @@
+{% load utility_tags user_filters %}
+
+{% with selected=facets.selected|getitem:param %}
+    <div class="panel panel-default my-3">
+        {% include 'posts/includes/filter_heading.html' with title=title heading=heading %}
+        <div id="collapse-{{ title|slugify }}"
+             class="panel-collapse {% if not selected %}collapse{% endif %}"
+        >
+            <div class="panel-body">
+                <div class="list-group">
+                    {% include 'posts/includes/filter_all.html' with param=param %}
+                    {% for r_val, r_display in facets.categories|getitem:param %}
+                        <a class="list-group-item {% if selected.0 == r_val %}active{% endif %}"
+                           href="{% modify_query 'page' param|todict:r_val %}"
+                        >                  
+                            {{ r_display }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endwith%}
