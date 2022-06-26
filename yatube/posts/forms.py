@@ -9,6 +9,12 @@ from .models import RATING_CHOICES, Comment, Group, Post
 
 User = get_user_model()
 
+SORTING_CHOICES = (
+    ('-pub_date', 'дате публикации'),
+    ('-rating_avg', 'рейтингу'),
+    ('-comment_count', 'кол-ву комментариев'),
+)
+
 
 class PostForm(ModelForm):
     """Форма добавления/редактирования постов."""
@@ -75,4 +81,10 @@ class PostFilterForm(forms.Form):
         label='Рейтинг',
         required=False,
         choices=RATING_CHOICES,
+    )
+
+    sorting = forms.ChoiceField(
+        label='Сортировка',
+        required=False,
+        choices=SORTING_CHOICES,
     )

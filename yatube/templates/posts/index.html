@@ -10,13 +10,16 @@
 
     <aside class="col-12 col-md-2">
       <div class="filters panel-group" id="accordion">
-        {% with title='author' heading='автору' param='author' %}
+        {% with title='author' heading='Фильтр по автору' param='author' need_all=True %}
           {% include 'posts/includes/filter_categories.html' %}
         {% endwith %}
-        {% with title='group' heading='группе' param='group' %}
+        {% with title='group' heading='Фильтр по группе' param='group' need_all=True %}
           {% include 'posts/includes/filter_categories.html' %}
         {% endwith %}
-        {% with title='rating' heading='рейтингу' param='rating' %}
+        {% with title='rating' heading='Фильтр по рейтингу' param='rating' need_all=True %}
+          {% include 'posts/includes/filter_categories.html' %}
+        {% endwith %}
+        {% with title='sorting' heading='Сортировка по' param='sorting' need_all=False %}
           {% include 'posts/includes/filter_categories.html' %}
         {% endwith %}
       </div>

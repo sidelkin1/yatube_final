@@ -4,6 +4,8 @@ from django.db import models
 from django.db.models import FloatField
 from django.db.models.functions import Round
 
+from .forms import SORTING_CHOICES
+
 FloatField.register_lookup(Round)
 
 
@@ -15,9 +17,12 @@ def get_page_obj(page_number, posts):
 
 def create_facets(form):
     """Формируем заготовку для фильтров."""
-    facets = {'selected': {}, 'categories': {}}
+    facets = {
+        'selected': {'sorting': SORTING_CHOICES[0]},
+        'categories': {}
+    }
     for name, field in form.fields.items():
-        if name == 'rating':
+        if name in ['rating', 'sorting']:
             facets['categories'] |= {name: field.choices}
         else:
             facets['categories'] |= {name: tuple(
@@ -30,19 +35,21 @@ def filter_facets(facets, posts, form):
     """Фильтрует посты в соответствии с формой."""
     for param, choices in facets['categories'].items():
         if value := form.cleaned_data[param]:
-            selected_value = (
-                int(value) if param == 'rating' else value.pk
-            )
+            if param == 'rating':
+                selected_value = int(value)
+                posts = (
+                    posts.filter(rating_avg__round=selected_value).distinct()
+                )
+            elif param == 'sorting':
+                selected_value = value
+                posts = posts.order_by(value)
+            else:
+                selected_value = value.pk
+                posts = posts.filter(**{param: value}).distinct()
             facets['selected'][param] = (
                 selected_value,
                 dict(choices)[selected_value]
             )
-            if param == 'rating':
-                posts = (
-                    posts.filter(rating_avg__round=selected_value).distinct()
-                )
-            else:
-                posts = posts.filter(**{param: value}).distinct()
     return posts
 
 
@@ -53,6 +60,7 @@ def query_posts(queryset):
         ('group_count', models.Count, 'group__posts'),
         ('rating_avg', models.Avg, 'ratings__rating'),
         ('rating_count', models.Count, 'ratings'),
+        ('comment_count', models.Count, 'comments'),
     )
     for agg_field, agg_fun, group in subqueries:
         subquery = models.Subquery(

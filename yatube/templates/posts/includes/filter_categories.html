@@ -8,7 +8,9 @@
         >
             <div class="panel-body">
                 <div class="list-group">
-                    {% include 'posts/includes/filter_all.html' with param=param %}
+                    {% if need_all %}
+                        {% include 'posts/includes/filter_all.html' with param=param %}
+                    {% endif %}
                     {% for r_val, r_display in facets.categories|getitem:param %}
                         <a class="list-group-item {% if selected.0 == r_val %}active{% endif %}"
                            href="{% modify_query 'page' param|todict:r_val %}"

@@ -2,50 +2,65 @@
 {% load  user_filters %}
 
 <article>
-    <ul>
-        <li>
-            Автор:
-            <a class="btn btn-info btn-sm"
-               href="{% url 'posts:profile' post.author.username %}"
-            >
-                {% if post.author.get_full_name %}
-                    {{ post.author.get_full_name }}
-                {% else %}
-                    {{ post.author.username }}
-                {% endif %}
-                <span class="badge bg-danger">{{ post.author_count }}</span>
-            </a>
-        </li>
-        <li>
-            Дата публикации: {{ post.pub_date|date:'d E Y' }}
-        </li>
-        <li>
-            Рейтинг:
-            <span class="badge rounded-pill bg-primary">
-                {% with stars=post.rating_avg|getstars  %}
-                    {% include 'posts/includes/rating_stars.html' %}
-                {% endwith %}
-            </span>
-        </li>
-    </ul>
+
+    <table style="width: 100%">
+        <colgroup>
+        <col style="width: 25%;">
+        <col style="width: 60%;">
+        <col style="width: 15%;">
+        </colgroup>
+        <tbody>
+            <tr>
+                <td>
+                    Дата публикации: {{ post.pub_date|date:'d E Y' }}
+                </td>
+                <td>
+                    Автор:
+                    <a class="btn btn-info btn-sm"
+                    href="{% url 'posts:profile' post.author.username %}"
+                    >
+                        {% if post.author.get_full_name %}
+                            {{ post.author.get_full_name }}
+                        {% else %}
+                            {{ post.author.username }}
+                        {% endif %}
+                        <span class="badge bg-danger">{{ post.author_count }}</span>
+                    </a>
+                </td>                
+                <td>
+                    Рейтинг:
+                    <span class="badge rounded-pill bg-primary">
+                        {% with stars=post.rating_avg|getstars  %}
+                            {% include 'posts/includes/rating_stars.html' %}
+                        {% endwith %}
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
     {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
         <img class="card-img my-2" src="{{ im.url }}">
     {% endthumbnail %}
-    <p>{{ post.text|linebreaksbr }}</p>    
-</article>
+    <p>{{ post.text|linebreaksbr}}</p>
 
-<div class="mb-5">
-    <a class="btn btn-primary btn-sm"
-    href="{% url 'posts:post_detail' post.id %}"
-    >
-        Подробнее
-    </a>
-    {% if not group and post.group %}
-        <a class="btn btn-info btn-sm"
-           href="{% url 'posts:group_list' post.group.slug %}"             
+    <div class="mb-5">
+        <a class="btn btn-primary btn-sm"
+        href="{% url 'posts:post_detail' post.id %}"
         >
-            #{{ post.group.title }}
-            <span class="badge bg-danger">{{ post.group_count }}</span>
+            Подробнее
         </a>
-    {% endif %}
-</div>
+        {% if not group and post.group %}
+            <a class="btn btn-info btn-sm"
+            href="{% url 'posts:group_list' post.group.slug %}"             
+            >
+                #{{ post.group.title }}
+                <span class="badge bg-danger">{{ post.group_count }}</span>
+            </a>
+        {% endif %}
+        <button type="button" class="btn btn-sm btn-outline-dark" disabled>
+            Комментарии <span class="badge bg-danger">{{ post.comment_count }}</span>
+        </button>
+    </div>
+
+</article>

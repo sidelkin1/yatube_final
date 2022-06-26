@@ -92,7 +92,7 @@ def post_create(request):
     """Создание нового поста."""
 
     form = PostForm(
-        request.POST or None,
+        data=request.POST or None,
         files=request.FILES or None
     )
     if form.is_valid():
@@ -120,7 +120,7 @@ def post_edit(request, post_id):
         return redirect('posts:post_detail', post_id=post_id)
 
     form = PostForm(
-        request.POST or None,
+        data=request.POST or None,
         files=request.FILES or None,
         instance=post
     )
@@ -157,7 +157,7 @@ class PostDeleteView(LockedView, DeleteView):
 def add_comment(request, post_id):
     """Добавление комментариев."""
     post = get_object_or_404(Post, pk=post_id)
-    form = CommentForm(request.POST or None)
+    form = CommentForm(data=request.POST or None)
     if form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
@@ -211,7 +211,7 @@ def rate_post(request, post_id):
     if user == post.author:
         return redirect('posts:post_detail', post_id=post_id)
 
-    form = RatingForm(request.POST or None)
+    form = RatingForm(data=request.POST or None)
     if form.is_valid():
         if rating := form.cleaned_data['rating']:
             Rating.objects.update_or_create(
